@@ -22,7 +22,7 @@ case $? in
     exit 1
 esac
 
-OUTPUT=$(dirname "$ROM")/$NAME.cue
+OUTPUT=$ROM.cue
 echo "FILE \"$NAME\" BINARY
 TRACK 01 $MODE/2352
 INDEX 01 00:00:00" > "$OUTPUT" &&
