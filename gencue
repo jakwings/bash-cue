@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+ROM=$1
+
+if [[ -z "$ROM" || ! -r "$ROM" ]]
+then
+  echo "USAGE: $(basename $0) FILENAME[.BIN/.IMG]"
+  exit -1
+fi
+
+NAME=$(basename "$ROM")
+echo $'\x02' | cmp -i 0:15 -n 1 - "$ROM"
+case $? in
+  0)
+    MODE=MODE2
+    ;;
+  1)
+    MODE=MODE1
+    ;;
+  *)
+    echo "Invalid file format: $ROM"
+    exit 1
+esac
+
+OUTPUT=$(dirname "$ROM")/$NAME.cue
+echo "FILE \"$NAME\" BINARY
+TRACK 01 $MODE/2352
+INDEX 01 00:00:00" > "$OUTPUT" &&
+  echo "CUE file generated: $OUTPUT" ||
+  echo "Failed to generate CUE file for $ROM"
+
+# https://en.wikipedia.org/wiki/Cue_sheet_(computing)
+# https://en.wikipedia.org/wiki/CD-ROM#CD-ROM_format
