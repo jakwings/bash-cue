@@ -1,14 +1,20 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-ROM=$1
+set -e
 
-if [[ -z "${ROM}" || ! -r "${ROM}" ]]
+echo() {
+  printf '%s\n' "$*"
+}
+
+ROM="$1"
+
+if [ -z "${ROM}" ] || [ ! -r "${ROM}" ]
 then
-  echo "USAGE: $(printf %q "$(basename -- "$0")") FILENAME[.BIN/.IMG]"
-  exit -1
+  echo "USAGE: gencue FILENAME[.BIN/.IMG]"
+  exit 1
 fi
 
-echo $'\x02' | cmp -i 0:15 -n 1 - "${ROM}"
+printf '\002' | cmp -i 0:15 -n 1 - "${ROM}"
 case $? in
   0)
     MODE=MODE2
@@ -21,7 +27,7 @@ case $? in
     exit 1
 esac
 
-NAME=$(basename -- "$ROM")
+NAME="$(basename -- "${ROM}")"
 OUTPUT="${NAME}.cue"
 echo "FILE \"${NAME}\" BINARY
   TRACK 01 ${MODE}/2352
